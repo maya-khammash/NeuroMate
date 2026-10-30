@@ -1,0 +1,22 @@
+@import "./theme.css";
+
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+#root {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+  }
+  
+  .app-container {
+    width: 100%;
+    max-width: 1200px;
+    padding: 48px 24px;
+  }
+  

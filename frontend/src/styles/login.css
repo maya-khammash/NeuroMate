@@ -1,0 +1,64 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .login-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    padding: 48px 56px;
+    text-align: center;
+    width: 100%;
+    max-width: 520px;
+  }
+  
+  .app-title {
+    font-size: 3rem;
+    margin-bottom: 8px;
+  }
+  
+  .app-subtitle {
+    color: var(--text-muted);
+    margin-bottom: 36px;
+    font-size: 0.95rem;
+  }
+  
+  .role-label {
+    margin-bottom: 16px;
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  
+  .role-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+  }
+  
+  .role-btn {
+    padding: 14px 28px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  
+  .role-btn:hover {
+    transform: translateY(-2px);
+  }
+  
+  .role-btn.student {
+    background: var(--blue);
+    color: white;
+  }
+  
+  .role-btn.doctor {
+    background: var(--red);
+    color: white;
+  }
+  

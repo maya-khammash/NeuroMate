@@ -1,0 +1,149 @@
+from datetime import datetime, timedelta
+from typing import Optional
+
+from fastapi import Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordBearer
+
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+
+from sqlalchemy.orm import Session
+
+from app.db.database import SessionLocal
+from app.db import models
+
+
+# ========================
+# CONFIG
+# ========================
+
+SECRET_KEY = "super-secret-key"   # move to env later
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/signin")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+
+# ========================
+# DB DEP
+# ========================
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+# ========================
+# PASSWORDS
+# ========================
+
+def hash_password(password: str):
+    return pwd_context.hash(password[:72])
+
+def verify_password(plain, hashed):
+    return pwd_context.verify(plain, hashed)
+
+
+# ========================
+# TOKENS
+# ========================
+
+def create_access_token(data: dict):
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+
+# ========================
+# CURRENT USER
+# ========================
+
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+    )
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+    except JWTError:
+        raise credentials_exception
+
+    user = db.query(models.User).filter(
+        models.User.username == username
+    ).first()
+
+    if user is None:
+        raise credentials_exception
+
+    return user
+
+
+# ========================
+# OPTIONAL AUTH
+# ========================
+
+def get_current_user_optional(
+    token: Optional[str] = Depends(OAuth2PasswordBearer(tokenUrl="/auth/signin", auto_error=False)),
+    db: Session = Depends(get_db)
+):
+    if not token:
+        return None
+    
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            return None
+    except JWTError:
+        return None
+
+    user = db.query(models.User).filter(
+        models.User.username == username
+    ).first()
+
+    return user
+
+
+# ========================
+# ROLE GUARDS (FIXED)
+# ========================
+
+def require_admin(user = Depends(get_current_user)):
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin access only"
+        )
+    return user
+
+
+def require_doctor(user = Depends(get_current_user)):
+    # ✅ doctor + admin
+    if user.role not in ["doctor", "admin"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Doctor access only"
+        )
+    return user
+
+
+def require_student(user = Depends(get_current_user)):
+    # ✅ student + admin
+    if user.role not in ["student", "admin"]:
+        raise HTTPException(
+            status_code=403,
+            detail="Student access only"
+        )
+    return user

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login Test</title>
+</head>
+<body>
+    <h2>Test Login</h2>
+    
+    <div>
+        <h3>Doctor Login Test</h3>
+        <button onclick="testDoctorLogin()">Test Doctor Login</button>
+        <div id="doctor-result"></div>
+    </div>
+    
+    <div>
+        <h3>Admin Login Test</h3>
+        <button onclick="testAdminLogin()">Test Admin Login</button>
+        <div id="admin-result"></div>
+    </div>
+    
+    <div>
+        <h3>Student Login Test</h3>
+        <button onclick="testStudentLogin()">Test Student Login</button>
+        <div id="student-result"></div>
+    </div>
+
+    <script>
+        async function testLogin(username, password, resultId) {
+            const resultDiv = document.getElementById(resultId);
+            resultDiv.innerHTML = 'Testing...';
+            
+            try {
+                const formData = new URLSearchParams();
+                formData.append("username", username);
+                formData.append("password", password);
+
+                const response = await fetch("http://127.0.0.1:8000/auth/signin", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded",
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                resultDiv.innerHTML = `
+                    <h4>Response:</h4>
+                    <p><strong>Status:</strong> ${response.status}</p>
+                    <p><strong>Success:</strong> ${response.ok}</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                if (response.ok) {
+                    localStorage.setItem('test_token', data.access_token);
+                    localStorage.setItem('test_role', data.role);
+                    localStorage.setItem('test_user_id', data.user_id);
+                    localStorage.setItem('test_username', data.username);
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<p style="color: red;"><strong>Error:</strong> ${error.message}</p>`;
+            }
+        }
+        
+        function testDoctorLogin() {
+            testLogin('doctor1', 'doctor123', 'doctor-result');
+        }
+        
+        function testAdminLogin() {
+            testLogin('admin1', 'admin123', 'admin-result');
+        }
+        
+        function testStudentLogin() {
+            testLogin('student1', 'student123', 'student-result');
+        }
+    </script>
+</body>
+</html>

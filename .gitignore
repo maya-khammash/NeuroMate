@@ -1,0 +1,38 @@
+# Python virtual environments
+venv/
+.venv/
+**/venv/
+**/.venv/
+
+# Node dependencies
+node_modules/
+**/node_modules/
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter temporary files
+.ipynb_checkpoints/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Logs and temporary files
+*.log
+*.tmp
+# Model artifacts and large files (review before publishing)
+*.pkl
+
+# Database files
+*.db
+*.sqlite3
+# Database backups - review before publishing
+**/*database_backup*.sql

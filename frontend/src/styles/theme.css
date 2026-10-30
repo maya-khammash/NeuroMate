@@ -1,0 +1,14 @@
+:root {
+    --bg-main: radial-gradient(circle at top, #0b1220, #020617);
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --card-border: rgba(255, 255, 255, 0.08);
+  
+    --text-main: #e5e7eb;
+    --text-muted: #94a3b8;
+  
+    --blue: #2563eb;
+    --red: #dc2626;
+    --orange: #f97316;
+    --green: #16a34a;
+  }
+  
